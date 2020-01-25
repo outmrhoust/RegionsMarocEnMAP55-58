@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<!-- Template by Quackit.com -->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
+    <title>Population</title>
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="leaflet/leaflet.css" />
+  
+    <script src="donnees/CentresReg.js"></script>
+    <script src="leaflet/leaflet.js"></script>
+    <script src="leaflet/Control.MiniMap.js"></script>
+    <link rel="stylesheet" href="leaflet/Control.MiniMap.css" />
+    <script src="leaflet/Leaflet.GraphicScale.min.js"></script>
+    <link rel="stylesheet" href="leaflet/Leaflet.GraphicScale.min.css" />
+
+     <script src="donnees/IndicRegions.js"></script>
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    
+     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+<style>
+    #map {
+    width: 600px;
+    height: 400px;
+}
+
+.info {
+    padding: 6px 8px;
+    font: 14px/16px Arial, Helvetica, sans-serif;
+    background: white;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.info h4 {
+    margin: 0 0 5px;
+    color: #777;
+}
+
+.legend {
+    line-height: 20px;
+    color: #555;
+}
+
+.legend i {
+    width: 15px;
+    height: 15px;
+    float: left;
+    margin-right: 8px;
+    opacity: 1;
+}
+</style>
+  
+
+        
+</head>
+
+<body>
+
+   
+
+
+
+ <div id="content">
+                           <center> <div id="mapid" style="width: 80%; height: 550px;"></div></center>
+
+
+                            <script>
+                                var grayscale = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ'}),
+                                    streets   = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'});
+                                    satellite = L.tileLayer('http://{s}.tile.openstreetmap.se/hydda/base/{z}/{x}/{y}.png', {attribution: 'Tiles courtesy of <a href="http://openstreetmap.se/" target="_blank">OpenStreetMap Sweden</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'});
+                                    googlesatellite  = L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'],iconURL: '//stamen-tiles-a.a.ssl.fastly.net/toner/4/2/5.png'
+                                 });
+                                    googleHybrid = L.tileLayer('http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{ maxZoom: 20, subdomains:['mt0','mt1','mt2','mt3'] });
+
+                               var mymap = L.map('mapid', { layers: [ grayscale],}).setView([30.976974, -6.866454], 5);
+
+
+                                  var baseLayers = {
+
+                                        " grayscale ": grayscale,
+                                        "Google Streets": streets,
+                                        "Carte grise": satellite,
+                                        "Vue Satellite": googlesatellite,
+                                        "Google Hybride ":googleHybrid,
+
+                                    };
+                                    L.control.layers(baseLayers).addTo(mymap);
+
+                                    mymap.addControl(new L.Control.Fullscreen());
+
+                              
+                                // Graphic Scale
+                                var graphicScale = L.control.graphicScale({
+                                    doubleLine: true,
+                                    fill: 'hollow',
+                                    showSubunits: true
+                                }).addTo(mymap);
+
+                          
+
+
+                                function Monstyle(feature) {
+                                    return {
+                                        weight: 2,
+                                        opacity: 1,
+                                        color: "black",
+                                        dashArray: "0",
+                                        fillOpacity: 0.7,
+                                     
+                                    };
+                                }
+
+
+
+
+
+
+                                var info = L.control();
+
+                                info.onAdd = function(mymap) {
+                                    this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+                                    this.update();
+                                    return this._div;
+                                };
+
+                                // method that we will use to update the control based on feature properties passed
+                                info.update = function(props) {
+
+                                    this._div.innerHTML = "<h4>Population par région pour le Maroc :RGPH 2014 </h4>" 
+                                };
+
+                                info.addTo(mymap);
+
+                                var geojson = L.geoJSON(polygone, {
+                                    style: Monstyle,
+                                    //onEachFeature: onEachFeature,
+                                }).addTo(mymap);
+
+                                //PREP
+
+
+                                var pointlayer = L.geoJson(point, {
+
+                                    style: style,
+                                    onEachFeature: onEachFeature2,
+                                    pointToLayer: function(feature, ll) {
+
+                                        return L.circleMarker(ll, {
+                                            color: '#ff7900',
+                                            opacity: 1,
+                                            weight: 2,
+                                            fillColor: '#ff7900',
+                                            fillOpacity: 1,
+
+                                            radius: calcRadius(Number(feature.properties.POPULATION))
+                                        });
+                                    },
+
+
+                                }).addTo(mymap);
+
+                                var pointlayer1 = L.geoJson(point, {
+
+                                    style: style,
+                                    onEachFeature: onEachFeature3,
+                                    pointToLayer: function(feature, ll) {
+
+                                        return L.circleMarker(ll, {
+                                            color: '#ff7900',
+                                            opacity: 1,
+                                            weight: 2,
+                                            fillColor: '#ff7900',
+                                            fillOpacity: 1,
+
+                                            radius: calcRadius(Number(feature.properties.ETRANGER))
+                                        });
+                                    },
+
+
+                                })
+                                  var pointlayer2 = L.geoJson(point, {
+
+                                    style: style,
+                                    onEachFeature: onEachFeature4,
+                                    pointToLayer: function(feature, ll) {
+
+                                        return L.circleMarker(ll, {
+                                            color: '#ff7900',
+                                            opacity: 1,
+                                            weight: 2,
+                                            fillColor: '#ff7900',
+                                            fillOpacity: 1,
+
+                                            radius: calcRadius(Number(feature.properties.MAROCAIN))
+                                        });
+                                    },
+
+
+                                })
+
+
+
+
+
+
+
+                                function onEachFeature2(feature, layer) {
+
+                                    layer.on({
+                                        mouseover: function() {
+
+                                            layer.setStyle({
+                                                color: "yellow",
+                                                weight: 3
+                                            });
+
+                                        },
+                                        mouseout: function() {
+
+                                            layer.setStyle({
+                                                color: "whitesmoke",
+                                                weight: 1
+                                            });
+                                        }
+                                    });
+
+                                   
+
+                                    var toolTipInfo = "Région : " + feature.properties.regions + "<br>" +
+                                        "Population : " + feature.properties.POPULATION + "<br>"
+
+
+                                    layer.bindTooltip(toolTipInfo, {
+                                        sticky: true
+                                    });
+
+                                }
+
+function onEachFeature3(feature, layer) {
+
+                                    layer.on({
+                                        mouseover: function() {
+
+                                            layer.setStyle({
+                                                color: "yellow",
+                                                weight: 3
+                                            });
+
+                                        },
+                                        mouseout: function() {
+
+                                            layer.setStyle({
+                                                color: "whitesmoke",
+                                                weight: 1
+                                            });
+                                        }
+                                    });
+
+                                 
+
+                                    var toolTipInfo1 = "Région : " + feature.properties.regions + "<br>" +
+                                        "Population etrangère : " + feature.properties.ETRANGER + "<br>"
+
+
+                                    layer.bindTooltip(toolTipInfo1, {
+                                        sticky: true
+                                    });
+
+                                }
+                                function onEachFeature4(feature, layer) {
+
+                                    layer.on({
+                                        mouseover: function() {
+
+                                            layer.setStyle({
+                                                color: "yellow",
+                                                weight: 3
+                                            });
+
+                                        },
+                                        mouseout: function() {
+
+                                            layer.setStyle({
+                                                color: "whitesmoke",
+                                                weight: 1
+                                            });
+                                        }
+                                    });
+
+                                 
+
+                                    var toolTipInfo2 = "Région : " + feature.properties.regions + "<br>" +
+                                        "Population marocaine : " + feature.properties.MAROCAIN + "<br>"
+
+
+                                    layer.bindTooltip(toolTipInfo2, {
+                                        sticky: true
+                                    });
+
+                                }
+
+
+
+
+
+                                function style(feature) {
+
+                                    var styleOptions = {
+
+                                        fillOpacity: .6,
+                                        color: "#ABC8E2",
+                                        weight: 1
+
+                                    }
+
+                                  
+                                    return styleOptions;
+
+                                }
+
+
+
+                                function calcRadius(val) {
+
+                                    var radius = Math.log(val / Math.PI);
+                                    return radius * 2;
+
+                                }
+
+
+L.control.layers({
+  "Population":pointlayer, 
+  "Population etrangère":pointlayer1,
+  "Population marocaine":pointlayer2
+
+}
+
+).addTo(mymap);  
+
+
+
+var legend = L.control({position: 'bottomleft'}); 
+
+legend.onAdd = function (map) {
+ var divLeg = L.DomUtil.create('div', 'info legend');
+ divLeg.innerHTML +='Population : <br><img  src="images/symb.png">';
+ return divLeg;
+}; 
+
+legend.addTo(mymap);
+
+
+
+
+                                // MiniMap
+                                var osm2 = new L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                                    maxZoom: 18,
+                                    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, ' +
+                                        '<a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                                        'Imagery © <a href="http://mapbox.com">Mapbox</a>',
+                                    id: 'mapbox.streets'
+                                });
+                                //var osm2 = new L.TileLayer(osmUrl, {minZoom: 0, maxZoom: 13, attribution: osmAttrib });
+                                var miniMap = new L.Control.MiniMap(osm2, {
+                                    toggleDisplay: true
+                                }).addTo(mymap);
+
+                                miniMap.on("toggle", function(data) {
+                                    console.log("Listen for `toggle` event: miniMap is " + (data.minimized ? "minimize" : "restore"));
+                                });
+                                miniMap.on("minimize", function() {
+                                    console.log("Listen for `minimize` event");
+                                });
+                                miniMap.on("restore", function() {
+                                    console.log("Listen for `restore` event");
+                                });
+
+                                var actionButton = new(L.Control.extend({
+                                    options: {
+                                        position: 'topleft',
+                                        html: "#",
+                                        toggleClass: "toggle",
+                                        status: false,
+                                        listeners: []
+                                    },
+                                    initialize: function(options) {
+                                        L.setOptions(this, options);
+                                        this._status = this.options.status;
+                                    },
+
+                                    onAdd: function() {
+                                        var container = L.DomUtil.create('div', 'leaflet-control-actionbtn leaflet-bar leaflet-control');
+                                        var link = this._link = L.DomUtil.create('a', '', container);
+                                        link.href = '#';
+                                        link.innerHTML = this.options.html;
+                                        link.title = this.options.title || this.options.html;
+                                        L.DomEvent.on(link, 'click', this._onBtnClick, this);
+                                        if (this.options.status) {
+                                            this._toggle();
+                                        }
+                                        this._addListeners();
+                                        return container;
+                                    },
+
+                                    toggle: function() {
+                                        this._toggle();
+                                        if (this.options.action) {
+                                            this._removeListeners();
+                                            this._forListeners(null, function(listener) {
+                                                listener[0].once(listener[1], this._addListeners, this);
+                                            });
+                                            this.options.action.call(this, this._status);
+                                        }
+                                    },
+
+                                    _toggle: function() {
+                                        this._status = !this._status;
+                                        if (!this._status) {
+                                            L.DomUtil.addClass(this._link, this.options.toggleClass);
+                                        } else {
+                                            L.DomUtil.removeClass(this._link, this.options.toggleClass);
+                                        }
+                                    },
+
+                                    _addListeners: function() {
+                                        this._forListeners();
+                                    },
+
+                                    _removeListeners: function() {
+                                        this._forListeners(true);
+                                    },
+
+                                    _forListeners: function(off, func) {
+                                        if (this.options.listeners.length) {
+                                            for (var fry = 0; fry < this.options.listeners.length; fry++) {
+                                                var listener = this.options.listeners[fry];
+                                                var action = listener[0] && listener[0][off ? "off" : "on"];
+                                                if (action && typeof listener[1] === 'string') {
+                                                    if (func) {
+                                                        func.call(this, listener);
+                                                    } else {
+                                                        action.call(listener[0], listener[1], this._toggle, this);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    },
+
+                                    _onBtnClick: function(e) {
+                                        L.DomEvent.stop(e);
+                                        this.toggle();
+                                    }
+                                }))({
+                                    action: function() {
+                                        miniMap._toggleDisplayButtonClicked();
+                                    },
+                                    status: !miniMap._minimized,
+                                    html: "MM",
+                                    listeners: [
+                                        [miniMap, "toggle"]
+                                    ]
+                                });
+                                actionButton.addTo(mymap);
+
+                              
+                            </script>
+
+
+         
+        
+        
+  </footer>
+	
+    <!-- jQuery -->
+    <script src="js/jquery-1.11.3.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="js/bootstrap.min.js"></script>
+	
+	<!-- IE10 viewport bug workaround -->
+	<script src="js/ie10-viewport-bug-workaround.js"></script>
+	
+	<!-- Placeholder Images -->
+	<script src="js/holder.min.js"></script>
+
+      <script src="../js/jquery.min.js"></script>
+    <script src="../js/jquery.dropotron.min.js"></script>
+    <script src="../js/browser.min.js"></script>
+    <script src="../js/breakpoints.min.js"></script>
+    <script src="../js/util.js"></script>
+    <script src="../js/main.js"></script>
+
+	
+</body>
+
+</html>
