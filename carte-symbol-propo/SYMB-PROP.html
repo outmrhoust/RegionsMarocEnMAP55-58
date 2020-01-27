@@ -28,6 +28,7 @@
     
      <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+     <script src="leaflet/leaflet.browser.print.min.js"></script>
 <style>
     #map {
     width: 600px;
@@ -473,6 +474,13 @@ legend.addTo(mymap);
                                     ]
                                 });
                                 actionButton.addTo(mymap);
+
+            L.control.browserPrint().addTo(mymap);
+                        mymap.on("browser-print-start", function(e){
+                
+                legend.addTo(e.printMap);
+                graphicScale.addTo(e.printMap);
+            });
 
                               
                             </script>
