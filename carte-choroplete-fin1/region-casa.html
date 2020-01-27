@@ -652,7 +652,19 @@ function onEachFeature5(feature, layer) {
     }
                                     return div;
                                 };
+ L.control.browserPrint().addTo(map);
+  map.on("browser-print-start", function(e){
 
+
+                
+               legend.addTo(e.printMap);
+                  legend1.remove(e.printMap);
+                     legend2.remove(e.printMap);
+                        legend3.remove(e.printMap);
+                           legend4.remove(e.printMap);
+                              legend5.remove(e.printMap);
+
+               });
                                
 
 geojson.beforeAdd = function (map) {
