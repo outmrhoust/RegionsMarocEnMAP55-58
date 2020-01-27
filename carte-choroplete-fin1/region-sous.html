@@ -28,6 +28,7 @@
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
       <link rel="stylesheet" href="leaflet/leaflet-search.css" />
 <script src="leaflet/leaflet-search.js"></script>
+ <script src="leaflet/leaflet.browser.print.min.js"></script>
 <style >
     #map {
             width: 800px;
@@ -666,42 +667,112 @@ geojson.beforeAdd = function (map) {
 legend2.remove(map);
 legend3.remove(map);
 legend4.remove(map);
-legend5.remove(map);}
+legend5.remove(map);
+     map.on("browser-print-start", function(e){
+
+
+                
+               legend.addTo(e.printMap);
+                  legend1.remove(e.printMap);
+                     legend2.remove(e.printMap);
+                        legend3.remove(e.printMap);
+                           legend4.remove(e.printMap);
+                              legend5.remove(e.printMap);
+
+               });
+
+}
     geojson1.beforeAdd = function (map) {
     legend1.addTo(map);
     legend.remove(map);
 legend2.remove(map);
 legend3.remove(map);
 legend4.remove(map);
-legend5.remove(map);}
+legend5.remove(map);
+     map.on("browser-print-start", function(e){
+
+
+                
+              legend1.addTo(e.printMap);
+                  legend.remove(e.printMap);
+                     legend2.remove(e.printMap);
+                        legend3.remove(e.printMap);
+                           legend4.remove(e.printMap);
+                              legend5.remove(e.printMap);
+               });
+                       }
      geojson2.beforeAdd = function (map) {
     legend2.addTo(map);
     legend.remove(map);
 legend1.remove(map);
 legend3.remove(map);
 legend4.remove(map);
-legend5.remove(map);}
+legend5.remove(map);
+ map.on("browser-print-start", function(e){
+
+
+                
+              legend2.addTo(e.printMap);
+                  legend.remove(e.printMap);
+                     legend1.remove(e.printMap);
+                        legend3.remove(e.printMap);
+                           legend4.remove(e.printMap);
+                              legend5.remove(e.printMap);
+               });}
  geojson3.beforeAdd = function (map) {
     legend3.addTo(map);
     legend2.remove(map);
 legend1.remove(map);
 legend.remove(map);
 legend4.remove(map);
-legend5.remove(map);}
+legend5.remove(map);
+ map.on("browser-print-start", function(e){
+
+
+                
+              legend3.addTo(e.printMap);
+                  legend.remove(e.printMap);
+                     legend1.remove(e.printMap);
+                        legend2.remove(e.printMap);
+                           legend4.remove(e.printMap);
+                              legend5.remove(e.printMap);
+               });}
  geojson4.beforeAdd = function (map) {
     legend4.addTo(map);
     legend2.remove(map);
 legend1.remove(map);
 legend.remove(map);
 legend3.remove(map);
-legend5.remove(map);}
+legend5.remove(map);
+ map.on("browser-print-start", function(e){
+
+
+                
+              legend4.addTo(e.printMap);
+                  legend1.remove(e.printMap);
+                     legend2.remove(e.printMap);
+                        legend3.remove(e.printMap);
+                           legend.remove(e.printMap);
+                              legend5.remove(e.printMap);
+               });}
 geojson5.beforeAdd = function (map) {
     legend5.addTo(map);
     legend2.remove(map);
 legend1.remove(map);
 legend.remove(map);
 legend3.remove(map);
-legend4.remove(map);}
+legend4.remove(map);
+ map.on("browser-print-start", function(e){
+
+
+                
+              legend5.addTo(e.printMap);
+                  legend.remove(e.printMap);
+                     legend1.remove(e.printMap);
+                        legend2.remove(e.printMap);
+                           legend3.remove(e.printMap);
+                              legend4.remove(e.printMap);
+               });}
 
 
 
